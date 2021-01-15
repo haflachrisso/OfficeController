@@ -4,7 +4,12 @@
 #include "mbed.h"
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
+#include <cstdio>
 #include <string>
+
+#define LCD_SMALL_FONT        Font16 //Small font constant
+#define LCD_MEDIUM_FONT        Font20 //Medium font constant
+#define LCD_XSMALL_FONT         Font12 //Extra small font constant
 
 
 class LCD_Button {
@@ -24,6 +29,15 @@ class LCD_Button {
     void draw(bool active) {
         BSP_LCD_SetTextColor(_borderColor);
         BSP_LCD_DrawRect(_x,_y, _w,_h);
+        BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+        BSP_LCD_SetFont(&LCD_MEDIUM_FONT);
+        int numChar = _label.length();
+        printf("NumChar: %d\n",numChar);
+        int stringWidth = numChar*14;
+        int marginToCenterTextH = (_w-stringWidth)/2;
+        printf("Nmargin: (%d/%d)/2 = %d\n",_w,stringWidth, marginToCenterTextH);
+        int marginToCenterTextV = (_h-20)/2;
+        BSP_LCD_DisplayStringAt(_x+marginToCenterTextH,_y+marginToCenterTextV, (uint8_t *)_label.c_str(), LEFT_MODE);
         if(active) {
             BSP_LCD_FillRect(_x,_y, _w,_h);
         }

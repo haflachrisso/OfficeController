@@ -113,3 +113,8 @@ void SoundControllerString(int number,uint16_t x) {
     sprintf((char *) text, "Warnings:%2d", number);
     BSP_LCD_DisplayStringAt(x, 160, (uint8_t *)text, RIGHT_MODE);
 }
+
+void SoundLevelGraph(int numbers[100]) {
+    //BSP_LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
+
+}

@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
+#include <cstddef>
 #include <cstdio>
 #include <string>
 
@@ -37,9 +38,15 @@ bool celciusOrFahrenheit;
 char buffer[32] = {0};
 string officeLocale = "";
 int alarmInt = 2;
-bool running = false;
 
+enum Screen {home,sound};
+
+Screen currentScreen = home;
 Thread thread2;
+
+
+int soundValues[100];
+int soundValuesArrayCounter = 0;
 
 // Decides if show temp in fahrenheit or celcius
 void tempUnit() {
@@ -51,6 +58,8 @@ void tempUnit() {
     TemperatureString(fahrenheitString);
   }
 }
+
+
 
 void NightOrDay(float light) {
   if (light > 0.150) {
@@ -89,27 +98,35 @@ void SoundController(float noise, float light) {
 }
 
 void valueReply() {
-    while(true) { 
-        pc.set_blocking(false);
-        if (uint32_t num = pc.read(buffer, sizeof(buffer))) {
-            if (strcmp(buffer, "1") == 0) {
-                printf("%s:Temp: %3.3f\n", officeLocale.c_str(),temperature);
-            } else if(strcmp(buffer, "2") == 0){
-                printf("%s: Sound: %3.3f\n", officeLocale.c_str(),soundLevel);
-            } else if(strcmp(buffer, "3") == 0){
-                printf("%s: Light: %3.3f\n", officeLocale.c_str(),lightLevel);
-            }
-        }
-        wait_us(1000000);
-        }
+  while (true) {
+    pc.set_blocking(false);
+    if (uint32_t num = pc.read(buffer, sizeof(buffer))) {
+      if (strcmp(buffer, "1") == 0) {
+        printf("%s:Temp: %3.3f\n", officeLocale.c_str(), temperature);
+      } else if (strcmp(buffer, "2") == 0) {
+        printf("%s: Sound: %3.3f\n", officeLocale.c_str(), soundLevel);
+      } else if (strcmp(buffer, "3") == 0) {
+        printf("%s: Light: %3.3f\n", officeLocale.c_str(), lightLevel);
+      }
+    }
+    wait_us(1000000);
+  }
 }
 
 
+void addSoundLevelToArray(float sound,int counter) {
+    int index =  counter%100;
+    int soundInPercent = sound*100;
+    soundValues[index] = soundInPercent;
+}
+
+// Buttons
+LCD_Button resetButton(280, 160, 160, 30, LCD_COLOR_BLACK, "");
+LCD_Button alarmButton(280, 130, 160, 30, LCD_COLOR_BLACK, "");
+LCD_Button toSoundScreen(260,200,200,60,LCD_COLOR_DARKCYAN,"Sound Graph");
+LCD_Button toTempScreen(20,200,200,60,LCD_COLOR_DARKCYAN,"Temp Graph");
 
 
-//Buttons
-LCD_Button resetButton(280,160,160,30,LCD_COLOR_BLACK,"");
-LCD_Button alarmButton(280,130,160,30,LCD_COLOR_BLACK,"");
 
 
 
@@ -132,7 +149,7 @@ int main() {
       // pc.write(buffer,sizeof(buffer));
       if (strcmp(buffer, "\r") == 0) {
         // nothing
-      } else if (strcmp(buffer, "\b\b") == 0) {
+      } else if (strcmp(buffer, "\b\b") == 0) { // No working
         officeLocale.pop_back();
       } else {
         officeLocale.push_back(buffer[0]);
@@ -144,16 +161,20 @@ int main() {
   }
 
   HomeScreen(officeLocale);
-    thread2.start(&valueReply);
-  
+  toSoundScreen.draw(false);
+  toTempScreen.draw(false);
+  thread2.start(&valueReply);
+
   while (true) {
     temperature = tempSensor.getTemperature();
     soundLevel = soundSensor.read();
     lightLevel = lightSensor.read();
     // printf("percentage: %3.3f%%\n", ain.read() * 100.0f);
     // printf("Temp: %3.3f\n", temperature);
-    //printf("Sound: %3.3f\n", soundLevel);
+    // printf("Sound: %3.3f\n", soundLevel);
     // printf("Light: %3.3f\n", lightLevel);
+
+    //Touch screen operations
     BSP_TS_GetState(&TS_State);
     if (TS_State.touchDetected) {
       for (idx = 0; idx < TS_State.touchDetected; idx++) {
@@ -161,13 +182,18 @@ int main() {
         y = TS_State.touchY[idx];
         printf("Touch %d: x=%d y=%d    \n", idx + 1, x, y);
       }
-      if(resetButton.pressed(x, y)) {
-          warningCounter = 0;
+      if (resetButton.pressed(x, y)) {
+        warningCounter = 0;
       }
 
-      if(alarmButton.pressed(x, y)) {
+      if (alarmButton.pressed(x, y)) {
         alarmInt++;
         printf("AlarmPress");
+      }
+
+      if(toSoundScreen.pressed(x,y)) {
+          currentScreen = sound;
+          printf("ToSound");
       }
     } else {
       if (!cleared) {
@@ -179,18 +205,32 @@ int main() {
     // printf("\n%s\n", officeLocale.c_str());
     celciusOrFahrenheit = toggleButton.getToggle();
     // tempUnit();
-    NightOrDay(lightLevel);
-    TempController(temperature);
-    SoundController(soundLevel,lightLevel);
-    if(lightLevel < 0.150 && soundLevel > 0.900) {
-        alarmInt = 0;
+    switch (currentScreen) {
+    case home:
+        NightOrDay(lightLevel);
+        TempController(temperature);
+        SoundController(soundLevel, lightLevel);
+        break;
+    case sound:
+
+        break;
     }
-    if(alarmInt != 2) {
-            GreenLed = !GreenLed;
-        }
-        else {
-            GreenLed = 0;
-        }
+
+
+    // Starts alarm if dark and loud noises
+    if (lightLevel < 0.150 && soundLevel > 0.900) {
+      alarmInt = 0;
+    }
+    if (alarmInt != 2) {
+      GreenLed = !GreenLed;
+    } else {
+      GreenLed = 0;
+    }
+
+    addSoundLevelToArray(soundLevel,soundValuesArrayCounter);
+    soundValuesArrayCounter++;
+    //printf("Array: %3d %3d %3d %3d %3d \n",soundValues[0],soundValues[1],soundValues[2],soundValues[3],soundValues[4]);
+
 
     wait_us(250000);
   }
