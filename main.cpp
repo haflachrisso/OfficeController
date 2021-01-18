@@ -131,7 +131,6 @@ void drawCompleteGraph(int allSsoundValues[100], int counter) {
   }
   string avrString = to_string(soundTotal/soundsAboveZero);
   averageSound+=avrString+"%";
-  printf("Tegn lige \n");
   DrawGraph(soundValues[max(index - 1, 0)],max(index - 1, 0),soundValues[index], index,averageSound);
 }
 
