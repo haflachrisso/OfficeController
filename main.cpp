@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "stm32746g_discovery_lcd.h"
 #include "stm32746g_discovery_ts.h"
+#include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <string>
@@ -39,14 +40,14 @@ char buffer[32] = {0};
 string officeLocale = "";
 int alarmInt = 2;
 
-enum Screen {home,sound};
-
+enum Screen { home, sound };
+bool graphOutlineDrawn = false;
 Screen currentScreen = home;
 Thread thread2;
 
-
 int soundValues[100];
 int soundValuesArrayCounter = 0;
+
 
 // Decides if show temp in fahrenheit or celcius
 void tempUnit() {
@@ -58,8 +59,6 @@ void tempUnit() {
     TemperatureString(fahrenheitString);
   }
 }
-
-
 
 void NightOrDay(float light) {
   if (light > 0.150) {
@@ -113,22 +112,35 @@ void valueReply() {
   }
 }
 
+void addSoundLevelToArray(float sound, int counter) {
+  int index = counter % 100;
+  int soundInPercent = sound * 100;
+  soundValues[index] = soundInPercent;
+}
 
-void addSoundLevelToArray(float sound,int counter) {
-    int index =  counter%100;
-    int soundInPercent = sound*100;
-    soundValues[index] = soundInPercent;
+void drawCompleteGraph(int allSsoundValues[100], int counter) {
+  int index = counter % 100;
+  int soundTotal = 0;
+  int soundsAboveZero = 0;
+  string averageSound = "Avg. Sound Lvl: ";
+  for(int x: soundValues) {
+      if(x > 0) {
+          soundTotal+=x;
+          soundsAboveZero++;
+      }
+  }
+  string avrString = to_string(soundTotal/soundsAboveZero);
+  averageSound+=avrString+"%";
+  printf("Tegn lige \n");
+  DrawGraph(soundValues[max(index - 1, 0)],max(index - 1, 0),soundValues[index], index,averageSound);
 }
 
 // Buttons
 LCD_Button resetButton(280, 160, 160, 30, LCD_COLOR_BLACK, "");
 LCD_Button alarmButton(280, 130, 160, 30, LCD_COLOR_BLACK, "");
-LCD_Button toSoundScreen(260,200,200,60,LCD_COLOR_DARKCYAN,"Sound Graph");
-LCD_Button toTempScreen(20,200,200,60,LCD_COLOR_DARKCYAN,"Temp Graph");
-
-
-
-
+LCD_Button toSoundScreen(260, 200, 200, 60, LCD_COLOR_DARKCYAN, "Sound Graph");
+LCD_Button toTempScreen(20, 200, 200, 60, LCD_COLOR_DARKCYAN, "Temp Graph");
+LCD_Button toHomeScreen(10,15,37,32,LCD_COLOR_DARKCYAN, "");
 
 // main() runs in its own thread in the OS
 int main() {
@@ -163,18 +175,20 @@ int main() {
   HomeScreen(officeLocale);
   toSoundScreen.draw(false);
   toTempScreen.draw(false);
+  toHomeScreen.draw(false);
   thread2.start(&valueReply);
 
   while (true) {
     temperature = tempSensor.getTemperature();
     soundLevel = soundSensor.read();
     lightLevel = lightSensor.read();
+    addSoundLevelToArray(soundLevel, soundValuesArrayCounter);
     // printf("percentage: %3.3f%%\n", ain.read() * 100.0f);
     // printf("Temp: %3.3f\n", temperature);
     // printf("Sound: %3.3f\n", soundLevel);
     // printf("Light: %3.3f\n", lightLevel);
 
-    //Touch screen operations
+    // Touch screen operations
     BSP_TS_GetState(&TS_State);
     if (TS_State.touchDetected) {
       for (idx = 0; idx < TS_State.touchDetected; idx++) {
@@ -191,9 +205,14 @@ int main() {
         printf("AlarmPress");
       }
 
-      if(toSoundScreen.pressed(x,y)) {
-          currentScreen = sound;
-          printf("ToSound");
+      if (toSoundScreen.pressed(x, y)) {
+        currentScreen = sound;
+        printf("ToSound");
+      }
+
+      if (toHomeScreen.pressed(x,y)) {
+          currentScreen = home;
+          printf("ToHome");
       }
     } else {
       if (!cleared) {
@@ -207,13 +226,33 @@ int main() {
     // tempUnit();
     switch (currentScreen) {
     case home:
-        NightOrDay(lightLevel);
-        TempController(temperature);
-        SoundController(soundLevel, lightLevel);
-        break;
+    if (graphOutlineDrawn) {
+        clearMain();
+        toSoundScreen.draw(false);
+        toTempScreen.draw(false);
+    }
+      NightOrDay(lightLevel);
+      TempController(temperature);
+      SoundController(soundLevel, lightLevel);
+      graphOutlineDrawn = false;
+      break;
     case sound:
+      if (!graphOutlineDrawn) {
+        clearMain();
+        GraphOutline();
+      }
+      drawCompleteGraph(soundValues,soundValuesArrayCounter);
+      /*for (int x : soundValues) {
+          printf("%d - ",x);
+          DrawGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew)
+      }
+      for (int i = 0; i < sizeof(soundValues); i++) {
+          DrawGraph(soundValues[i],i,soundValues[min(i+1,99)],i+1);
+      }
+      */
 
-        break;
+      graphOutlineDrawn = true;
+      break;
     }
 
 
@@ -227,10 +266,9 @@ int main() {
       GreenLed = 0;
     }
 
-    addSoundLevelToArray(soundLevel,soundValuesArrayCounter);
     soundValuesArrayCounter++;
-    //printf("Array: %3d %3d %3d %3d %3d \n",soundValues[0],soundValues[1],soundValues[2],soundValues[3],soundValues[4]);
-
+    // printf("Array: %3d %3d %3d %3d %3d
+    // \n",soundValues[0],soundValues[1],soundValues[2],soundValues[3],soundValues[4]);
 
     wait_us(250000);
   }

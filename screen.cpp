@@ -25,7 +25,7 @@ void StartScreen() {
     BSP_LCD_SetBackColor(LCD_COLOR_DARKCYAN);
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
     BSP_LCD_DisplayStringAt(0, 100, (uint8_t *)"Office Environment", CENTER_MODE);
-    BSP_LCD_DrawEllipse(233, 110, 170, 65);
+    BSP_LCD_DrawEllipse(233, 110, 170, 60);
     BSP_LCD_SetFont(&LCD_SMALL_FONT);
     BSP_LCD_DisplayStringAt(0, 250, (uint8_t *)"Version 0.0.1", CENTER_MODE);
     HAL_Delay(1000);
@@ -56,17 +56,71 @@ BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
 BSP_LCD_DisplayStringAt(110, 152, (uint8_t *)locale.c_str(), LEFT_MODE);
 }
 
+
+void DrawPixelHomeButton() {
+    int homePixelArt[32][30] = {
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0},
+{0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0},
+{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0},
+{0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0},
+{0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0},
+{0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0},
+{0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+
+int baseX = 15;
+int baseY = 20;
+
+    for (int i = 0; i < 32; i++){
+        for (int j = 0; j < 28; j++){
+            if(homePixelArt[i][j] == 1) {
+                BSP_LCD_DrawPixel(baseX+j, baseY+i, LCD_COLOR_WHITE);
+            }
+        }
+    }
+}
+
+
 void HomeScreen(string locale) {
+
+
+
     BSP_LCD_Clear(LCD_COLOR_BLACK);
     BSP_LCD_SetFont(&LCD_MEDIUM_FONT);
     BSP_LCD_SetBackColor(LCD_COLOR_DARKCYAN);
     BSP_LCD_SetTextColor(LCD_COLOR_DARKCYAN);
     BSP_LCD_DrawRect (0,0, BSP_LCD_GetXSize()-2,BSP_LCD_GetYSize()-2);
-    BSP_LCD_FillRect(0,0, BSP_LCD_GetXSize()-2,70);
+    BSP_LCD_FillRect(0,0, BSP_LCD_GetXSize()-2,60);
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
     BSP_LCD_DisplayStringAt(0, 5, (uint8_t *)"Office Environment", CENTER_MODE);
     BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
     BSP_LCD_DisplayStringAt(0, 35, (uint8_t *)locale.c_str(), CENTER_MODE);
+    DrawPixelHomeButton();
+
 
     //updateValuesOnLCD();
 }
@@ -114,7 +168,45 @@ void SoundControllerString(int number,uint16_t x) {
     BSP_LCD_DisplayStringAt(x, 160, (uint8_t *)text, RIGHT_MODE);
 }
 
-void SoundLevelGraph(int numbers[100]) {
-    //BSP_LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
+void clearMain() {
+    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    BSP_LCD_FillRect(1,61, BSP_LCD_GetXSize()-3,BSP_LCD_GetYSize()-62);
+}
+
+void GraphOutline() {
+
+    BSP_LCD_SetFont(&LCD_XSMALL_FONT);
+    BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_DrawHLine(40, BSP_LCD_GetYSize()-7, 400);
+    BSP_LCD_DrawVLine(39, 65, 201);
+    BSP_LCD_DrawVLine(BSP_LCD_GetXSize()-39, 65, 201);
+    BSP_LCD_DisplayStringAt(20, 261, (uint8_t *)"0%", LEFT_MODE);
+    BSP_LCD_DisplayStringAt(15, 161, (uint8_t *)"50%", LEFT_MODE);
+    BSP_LCD_DisplayStringAt(10, 65, (uint8_t *)"100%", LEFT_MODE);
+    BSP_LCD_SetTextColor(LCD_COLOR_RED);
+    BSP_LCD_DrawHLine(40, 95, 400);
+}
+
+void DrawGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,string string) {
+    int xBoost = 40;
+    int yBoost = 65;
+    int xInc = 4;
+
+    int x1 = (xValueOld*xInc)+xBoost;
+    int x2 = (xValueNew*xInc)+xBoost;
+    int y1 = yBoost+(200-yValueOld*2);
+    int y2 = yBoost+(200-yValueNew*2);
+    BSP_LCD_SetBackColor(LCD_COLOR_TRANSPARENT);
+    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    BSP_LCD_FillRect(x2,65, 4,200);
+    BSP_LCD_SetFont(&LCD_XSMALL_FONT);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_DisplayStringAt(0, 250, (uint8_t *)string.c_str(), CENTER_MODE);
+    BSP_LCD_SetTextColor(LCD_COLOR_RED);
+    BSP_LCD_DrawHLine(40, 95, 400);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_DrawLine(x1, y1, x2, y2);
+
 
 }

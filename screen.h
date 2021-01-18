@@ -34,6 +34,15 @@ void TempControllerText(std::string string, uint32_t color,uint16_t x);
 //Sound controller text
 void SoundControllerText(std::string string, uint32_t color,uint16_t x);
 
+//Sound controller text
 void SoundControllerString(int number,uint16_t x);
+
+//Draw graph outline
+void GraphOutline();
+// Draw graph line
+void DrawGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,string string);
+//Claers main of screen
+void clearMain();
+
 
 #endif
