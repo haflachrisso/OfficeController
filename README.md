@@ -26,7 +26,7 @@ The premise is an embedded controller for an office environment, where temperatu
 <li>Grove Temperature Sensor V1.2 => A1</li>
 <li>Grove Sound Sensor => A3</li>
 <li>Grove Light Sensor => A2</li>
-<li>3 x Grove LED Sockets => D2 and D3</li>
+<li>3 x Grove LED Sockets => D2, D3 and D5</li>
 <li>Grove Red LED in socket => D2</li>
 <li>Grove Green LED in socket => D3</li>
 <li>Grove Blue LED in socket => D5</li>
@@ -43,7 +43,7 @@ A screen to input location name through a serial connection using a keyboard
 ### Home Screen
 
 #### Header
-Shows name of the project, and office location. Just underneath is a label showint whether the light sensor detects its day or night.
+Shows name of the project, and office location. Just underneath is a label showint whether the light sensor detects its day or night. On the left there is a a home buttom. which always takes you to the homescreen. 
 
 #### Main
 The left side shows current temperature. To switch between celcius and fahrenheit, press Grove Button. The optimal temperature is 25°C on this controller. If the the temperature drops, a heater turns on, symbolized by the Red Led.If the the temperature rises, the aircondition turns on, symbolized by the Blue Led.
@@ -54,7 +54,7 @@ The right side shows sound level. If noise becomes too high, the screen will sho
 Used to cycle through different screens, by touch.
 
 ### Sound Graph Screen
-Shows the last 100 measurements of sound level on a graph.//In progress
+Shows the last 100 measurements of sound level on a graph and the average soundlevel. 
 
 ### Temperature Graph Screen
-Shows the last 100 measurements of the temperature on a graph.//In progress
+Shows the last 100 measurements of the temperature on a graph and the average temperature.

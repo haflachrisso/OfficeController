@@ -1,3 +1,12 @@
+/**
+* @file helpers.h
+* @brief This header file contains all helper functions
+*
+* @author Christian Nick Rasmussen
+*
+* @date 2021/01/19
+*/
+
 #ifndef HELPERS_H
 #define HELPERS_H
 

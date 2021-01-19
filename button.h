@@ -1,3 +1,12 @@
+/**
+* @file button.h
+* @brief This header file contains the LCD_Button class
+*
+* @author Christian Nick Rasmussen
+*
+* @date 2021/01/19
+*/
+
 #ifndef BUTTON_H
 #define BUTTON_H
 
@@ -25,17 +34,16 @@ class LCD_Button {
         _label = label;
 
     }
-
+    // Draws the button if needed
     void draw(bool active) {
         BSP_LCD_SetTextColor(_borderColor);
         BSP_LCD_DrawRect(_x,_y, _w,_h);
         BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
         BSP_LCD_SetFont(&LCD_MEDIUM_FONT);
+        //Calculates to center text on button
         int numChar = _label.length();
-        printf("NumChar: %d\n",numChar);
         int stringWidth = numChar*14;
         int marginToCenterTextH = (_w-stringWidth)/2;
-        printf("Nmargin: (%d/%d)/2 = %d\n",_w,stringWidth, marginToCenterTextH);
         int marginToCenterTextV = (_h-20)/2;
         BSP_LCD_DisplayStringAt(_x+marginToCenterTextH,_y+marginToCenterTextV, (uint8_t *)_label.c_str(), LEFT_MODE);
         if(active) {
@@ -43,6 +51,7 @@ class LCD_Button {
         }
     };
 
+    //Returns true if the area of the button is touched
     bool pressed(int touchX,int touchY) {
         bool pressed = false;
         if((touchX >= _x && touchX <= _x+_w) && (touchY >= _y && touchY <= _y+_h)) {

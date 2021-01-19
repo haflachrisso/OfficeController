@@ -1,3 +1,12 @@
+/**
+* @file screen.h
+* @brief This header file will contain all required methods to draw the difference screens and content on the LCD
+*
+* @author Christian Nick Rasmussen
+*
+* @date 2021/01/19
+*/
+
 #ifndef SCREEN_H
 #define SCREEN_H
 
@@ -7,6 +16,9 @@
 #include "button.h"
 #include <cstdio>
 #include <string>
+
+
+
 
 // Initializes the LCD
 void ScreenInit();
@@ -37,10 +49,15 @@ void SoundControllerText(std::string string, uint32_t color,uint16_t x);
 //Sound controller text
 void SoundControllerString(int number,uint16_t x);
 
-//Draw graph outline
-void GraphOutline();
-// Draw graph line
-void DrawGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,string string);
+//Draw sound graph outline
+void SoundGraphOutline();
+
+//Draw temperature graph outline
+void TempGraphOutline();
+// Draw sound graph line
+void DrawSoundGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,string string);
+//Draw temp graph line
+void DrawTempGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,string string);
 //Claers main of screen
 void clearMain();
 
