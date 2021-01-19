@@ -35,7 +35,7 @@ class LCD_Button {
 
     }
     // Draws the button if needed
-    void draw(bool active) {
+    void draw() {
         BSP_LCD_SetTextColor(_borderColor);
         BSP_LCD_DrawRect(_x,_y, _w,_h);
         BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
@@ -46,9 +46,6 @@ class LCD_Button {
         int marginToCenterTextH = (_w-stringWidth)/2;
         int marginToCenterTextV = (_h-20)/2;
         BSP_LCD_DisplayStringAt(_x+marginToCenterTextH,_y+marginToCenterTextV, (uint8_t *)_label.c_str(), LEFT_MODE);
-        if(active) {
-            BSP_LCD_FillRect(_x,_y, _w,_h);
-        }
     };
 
     //Returns true if the area of the button is touched

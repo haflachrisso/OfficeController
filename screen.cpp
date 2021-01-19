@@ -1,3 +1,6 @@
+/**
+@file screen.cpp
+*/
 #include "mbed.h"
 #include "screen.h"
 #include "stm32746g_discovery_lcd.h"
@@ -10,7 +13,7 @@
 #define LCD_MEDIUM_FONT        Font20 //Medium font constant
 #define LCD_XSMALL_FONT         Font12 //Extra small font constant
 
-uint8_t status;
+uint8_t status; ///< Becomes 1/true if the LCD and Touch Screen is initialized
 
 /**
 * This method is used to initialize the screen
@@ -268,10 +271,7 @@ void TempGraphOutline() {
     BSP_LCD_DisplayStringAt(15, 261, (uint8_t *)"20C", LEFT_MODE);
     BSP_LCD_DisplayStringAt(15, 161, (uint8_t *)"25C", LEFT_MODE);
     BSP_LCD_DisplayStringAt(15, 65, (uint8_t *)"30C", LEFT_MODE);
-    BSP_LCD_SetTextColor(LCD_COLOR_RED);
-    BSP_LCD_DrawHLine(40, 140, 400);
-    BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-    BSP_LCD_DrawHLine(40, 150, 400);
+
 }
 /**
 * This method is used to draw one step of the sound graph
@@ -298,6 +298,10 @@ void DrawSoundGraph(int yValueOld,int xValueOld,int yValueNew,int xValueNew,stri
     BSP_LCD_SetFont(&LCD_XSMALL_FONT);
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
     BSP_LCD_DisplayStringAt(0, 250, (uint8_t *)string.c_str(), CENTER_MODE);
+    BSP_LCD_SetTextColor(LCD_COLOR_RED);
+    BSP_LCD_DrawHLine(40, 95, 400);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_DrawLine(x1, y1, x2, y2);
 
 }
 /**

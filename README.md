@@ -1,7 +1,7 @@
 # OfficeController
 
 A small embedded controller project by Christian Nick Rasmussen.
-Project started on 04/04/2021
+Project started on 2021/01/11
 
 The premise is an embedded controller for an office environment, where temperature and sound level is monitered. 
 

@@ -1,3 +1,7 @@
+/**
+* @file main.cpp
+*/
+
 #include "Grove_temperature.h"
 #include "helpers.h"
 #include "mbed.h"
@@ -28,7 +32,7 @@ float soundLevel;
 float lightLevel;
 float warningCounter = 0;
 
-uint16_t x, y;
+uint16_t x, y; ///< Xpos and Ypos of press on touch screen
 uint8_t idx;
 uint8_t cleared = 0;
 uint8_t prev_nb_touches = 0;
@@ -36,14 +40,15 @@ uint8_t prev_nb_touches = 0;
 uint8_t celciusString[25] = {0};
 uint8_t fahrenheitString[25] = {0};
 bool celciusOrFahrenheit;
-char buffer[32] = {0};
+
+char buffer[32] = {0}; ///< Serial Input Buffer
 string officeLocale = "";
 int alarmInt = 2;
 
-enum Screen { home, sound, temp };
+enum Screen { home, sound, temp }; ///< Enum for which screen to show on the LCD
 bool graphOutlineDrawn = false;
 Screen currentScreen = home;
-Thread thread2;
+Thread thread2; ///< Creates a second thread for not blocking serial input
 
 int soundValues[100];
 int soundValuesArrayCounter = 0;
@@ -52,8 +57,11 @@ float tempFloatValues[100];
 int tempValues[100];
 int tempValuesArrayCounter = 0;
 
-
-// Decides if show temp in fahrenheit or celcius
+/**
+* This method is used to decide whether to show temperature in Celcius or Fahrenheit
+* @author Christian Nick Rasmussen
+* @date 2021/01/19
+*/
 void tempUnit() {
   sprintf((char *)celciusString, "%4.2fC", temperature);
   sprintf((char *)fahrenheitString, "%4.2fF", temperature * 1.8 + 32);
@@ -63,7 +71,12 @@ void tempUnit() {
     TemperatureString(fahrenheitString);
   }
 }
-
+/**
+* This method is used to determined if it is dark or light in the room
+* @author Christian Nick Rasmussen
+* @param[in] light Light level from sensor
+* @date 2021/01/19
+*/
 void NightOrDay(float light) {
   if (light > 0.150) {
     NightOrDaytText("Daily Routine");
@@ -71,7 +84,12 @@ void NightOrDay(float light) {
     NightOrDaytText("Night Routine");
   }
 }
-
+/**
+* This method controls if the temperature is okay. If not "turns on" the aircondition or heater
+* @author Christian Nick Rasmussen
+* @param[in] temp Temperature in celcius
+* @date 2021/01/19
+*/
 void TempController(float temp) {
   tempUnit();
   if (temp < 25) {
@@ -88,7 +106,13 @@ void TempController(float temp) {
     TempControllerText("Idle", LCD_COLOR_WHITE, 80);
   }
 }
-
+/**
+* This method controls if the sound is okay. If not and it is dark, an alarm goes off
+* @author Christian Nick Rasmussen
+* @param[in] noise Sound level from sensor
+* @param[in] light Light level from sensor
+* @date 2021/01/19
+*/
 void SoundController(float noise, float light) {
   if (noise > 0.9) {
     SoundControllerText("NOISE WARNING", LCD_COLOR_RED, 20);
@@ -99,7 +123,11 @@ void SoundController(float noise, float light) {
   }
   SoundControllerString(warningCounter, 50);
 }
-
+/**
+* This method is run on Thread2 and checks for serial keyboard input and print the chosen value to the console
+* @author Christian Nick Rasmussen
+* @date 2021/01/19
+*/
 void valueReply() {
   while (true) {
     pc.set_blocking(false);
@@ -115,14 +143,25 @@ void valueReply() {
     wait_us(1000000);
   }
 }
-
+/**
+* This method adds values to the soundValues array and overrides from the begining once the array is "full"
+* @author Christian Nick Rasmussen
+* @param[in] sound Sound level from sensor
+* @param[in] counter A counter running through the index og the sound level array
+* @date 2021/01/19
+*/
 void addSoundLevelToArray(float sound, int counter) {
   int index = counter % 100;
   int soundInPercent = sound * 100;
   soundValues[index] = soundInPercent;
 }
 
-
+/**
+* This method changes temperature in celcius to an int from 1-100, to use the values as Y on the temp graph
+* @author Christian Nick Rasmussen
+* @param[in] temp Temperature in celcius
+* @date 2021/01/19
+*/
 
 int tempToPercent(float temp) {
     float tempPercent;
@@ -136,15 +175,26 @@ int tempToPercent(float temp) {
     
     return (int)tempPercent;
 }
-
+/**
+* This method adds values to the tempValues and tempFloatValues array and overrides from the begining once the array is "full"
+* @author Christian Nick Rasmussen
+* @param[in] temp Temperature in celcius
+* @param[in] counter A counter running through the index og the temperature arrays
+* @date 2021/01/19
+*/
 void addTemperatureToArray(float temp, int counter) {
     int index = counter % 100;
     tempFloatValues[index] = temp;
 
     tempValues[index] = tempToPercent(temp);
 }
-
-void drawCompleteSoundGraph(int allSsoundValues[100], int counter) {
+/**
+* This method gets the current and former sound level in the soundValues array and calculates average sound level of the last 100 measurements and uses these values to call the DrawSoundGraph
+* @author Christian Nick Rasmussen
+* @param[in] counter A counter running through the index og the sound level array
+* @date 2021/01/19
+*/
+void drawCompleteSoundGraph(int counter) {
   int index = counter % 100;
   int soundTotal = 0;
   int soundsAboveZero = 0;
@@ -159,7 +209,13 @@ void drawCompleteSoundGraph(int allSsoundValues[100], int counter) {
   averageSound+=avrString+"%";
   DrawSoundGraph(soundValues[max(index - 1, 0)],max(index - 1, 0),soundValues[index], index,averageSound);
 }
-void drawCompleteTempGraph(int allTempValues[100], int counter) {
+/**
+* This method gets the current and former temperature in the tempValues array and calculates average temperature of the last 100 measurements and uses these values to call the DrawTempGraph
+* @author Christian Nick Rasmussen
+* @param[in] counter A counter running through the index og the temperature array
+* @date 2021/01/19
+*/
+void drawCompleteTempGraph(int counter) {
   int index = counter % 100;
   float tempTotal = 0;
   int tempsAboveZero = 0;
@@ -214,8 +270,8 @@ int main() {
   }
 
   HomeScreen(officeLocale);
-  toSoundScreen.draw(false);
-  toTempScreen.draw(false);
+  toSoundScreen.draw();
+  toTempScreen.draw();
   //toHomeScreen.draw(false);
   thread2.start(&valueReply);
 
@@ -274,8 +330,8 @@ int main() {
     case home:
     if (graphOutlineDrawn) {
         clearMain();
-        toSoundScreen.draw(false);
-        toTempScreen.draw(false);
+        toSoundScreen.draw();
+        toTempScreen.draw();
     }
       NightOrDay(lightLevel);
       TempController(temperature);
@@ -287,7 +343,7 @@ int main() {
         clearMain();
         SoundGraphOutline();
       }
-      drawCompleteSoundGraph(soundValues,soundValuesArrayCounter);
+      drawCompleteSoundGraph(soundValuesArrayCounter);
       graphOutlineDrawn = true;
       break;
     
@@ -296,7 +352,7 @@ int main() {
             clearMain();
             TempGraphOutline();
         }
-        drawCompleteTempGraph(tempValues, tempValuesArrayCounter);
+        drawCompleteTempGraph(tempValuesArrayCounter);
         graphOutlineDrawn = true;
 
     }
