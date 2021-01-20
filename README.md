@@ -1,6 +1,6 @@
 # OfficeController
 
-A small embedded controller project by Christian Nick Rasmussen.
+A small, embedded controller project by Christian Nick Rasmussen.
 Project started on 2021/01/11
 
 The premise is an embedded controller for an office environment, where temperature and sound level is monitered. 
@@ -9,7 +9,7 @@ The premise is an embedded controller for an office environment, where temperatu
 
 <ul>
 <li>STM32 F7 Discovery Board</li>
-<li>USB A to mini B cable</li>
+<li>USB A to mini-B cable</li>
 <li>Grove Button</li>
 <li>Grove Temperature Sensor V1.2</li>
 <li>Grove Sound Sensor</li>
@@ -37,24 +37,34 @@ The premise is an embedded controller for an office environment, where temperatu
 ### Start Screen
 Shows version and if touchscreen is initialized. 
 
+![Start Screen Pic](https://i.imgur.com/gtavAgM.jpg)
+
 ### Input Screen
 A screen to input location name through a serial connection using a keyboard
 
+![Input Screen Pic](https://i.imgur.com/LEBHKNo.jpg)
 ### Home Screen
 
 #### Header
-Shows name of the project, and office location. Just underneath is a label showint whether the light sensor detects its day or night. On the left there is a a home buttom. which always takes you to the homescreen. 
+Shows name of the project, and office location. Just underneath is a label showing whether the light sensor detects its day or night. On the left there is a home button. which always takes you to the home screen.
 
 #### Main
-The left side shows current temperature. To switch between celcius and fahrenheit, press Grove Button. The optimal temperature is 25°C on this controller. If the the temperature drops, a heater turns on, symbolized by the Red Led.If the the temperature rises, the aircondition turns on, symbolized by the Blue Led.
+The left side shows current temperature. To switch between Celsius and Fahrenheit, press Grove Button. The optimal temperature is 25°C on this controller. If the temperature drops, a heater turns on, symbolized by the Red Led. If the temperature rises, the air condition turns on, symbolized by the Blue Led.
 
-The right side shows sound level. If noise becomes too high, the screen will show a warning. Every warning is counted and show underneath, to reset, press the counter. If it is night and noise is too high, an alarm goes off, symbolized by the green LED blinking. To turn the alarm off you have to double press the screen on the sound level text. 
+The right side shows sound level. If noise becomes too high, the screen will show a warning. Every warning is counted and show underneath, to reset, press the counter. If it is night and noise is too high, an alarm goes off, symbolized by the green LED blinking. To turn the alarm off you have to double press the screen on the sound level text.
+
 
 #### Bottom Buttons
 Used to cycle through different screens, by touch.
 
+![Home Screen Pic](https://i.imgur.com/dxrXLZD.jpg)
+
 ### Sound Graph Screen
 Shows the last 100 measurements of sound level on a graph and the average soundlevel. 
 
+![Home Screen Pic](https://i.imgur.com/BfEW3mP.jpg)
+
 ### Temperature Graph Screen
 Shows the last 100 measurements of the temperature on a graph and the average temperature.
+
+![Home Screen Pic](https://i.imgur.com/2ps0xZ5.jpg)
