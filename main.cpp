@@ -276,6 +276,7 @@ int main() {
   thread2.start(&valueReply);
 
   while (true) {
+    // Sets base data
     temperature = tempSensor.getTemperature();
     soundLevel = soundSensor.read();
     lightLevel = lightSensor.read();
@@ -302,6 +303,7 @@ int main() {
         alarmInt++;
         printf("AlarmPress");
       }
+
 
       if (toSoundScreen.pressed(x, y)) {
         currentScreen = sound;
